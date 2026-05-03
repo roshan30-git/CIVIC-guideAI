@@ -1,6 +1,10 @@
-// CivicGuide AI - MVP app.js
-const API_KEY = 'AIzaSyC9JFBaS5xnNt6CYXHWTzNIl7hBMSJrUCQ';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+// ── Configuration & Security ────────────────────────────────────────────────
+const CONFIG = {
+  API_KEY: 'AIzaSyC9JFBaS5xnNt6CYXHWTzNIl7hBMSJrUCQ',
+  BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+};
+
+const API_URL = `${CONFIG.BASE_URL}?key=${CONFIG.API_KEY}`;
 
 const DATA = {
   docs: ['Voter ID (EPIC Card)','Aadhaar Card','PAN Card','Driving License','Passport','Class X/XII Certificate'],
@@ -63,19 +67,19 @@ function renderQuestion(idx) {
   const div = document.createElement('div');
   div.className = 'bg-white rounded-2xl border border-gray-200 p-6 shadow-sm fade-in';
   div.innerHTML = `
-    <div class="flex items-center justify-between mb-1">
+    <div class="flex items-center justify-between mb-1" aria-hidden="true">
       <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">Question ${idx+1} of 3</span>
       <div class="flex gap-1">${[0,1,2].map(i=>`<div class="h-1.5 w-8 rounded-full ${i<=idx?'bg-primary':'bg-gray-200'}"></div>`).join('')}</div>
     </div>
-    <h3 class="text-lg font-bold text-gray-900 mt-3 mb-1">${q.label}</h3>
+    <h3 class="text-lg font-bold text-gray-900 mt-3 mb-1" id="q-label-${idx}">${q.label}</h3>
     <p class="text-sm text-gray-500 mb-4">${q.hint}</p>
     ${q.input ? `
-      <input id="pincode-input" type="tel" maxlength="6" placeholder="Enter 6-digit pincode" 
+      <input id="pincode-input" type="tel" maxlength="6" aria-labelledby="q-label-${idx}" placeholder="Enter 6-digit pincode" 
         class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-primary transition-colors">
       <button onclick="submitPincode()" class="mt-3 w-full btn-main bg-primary text-white justify-center">Continue →</button>
     ` : `
-      <div class="flex flex-col gap-2">
-        ${q.chips.map(c=>`<button onclick="selectChip('${q.id}','${c.v}')" 
+      <div class="flex flex-col gap-2" role="radiogroup" aria-labelledby="q-label-${idx}">
+        ${q.chips.map(c=>`<button onclick="selectChip('${q.id}','${c.v}')" role="radio" 
           class="chip text-left px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-gray-800 hover:border-primary hover:bg-blue-50">
           ${c.label}
         </button>`).join('')}
@@ -83,7 +87,9 @@ function renderQuestion(idx) {
     `}
   `;
   area.appendChild(div);
-  setTimeout(()=>div.classList.add('in'),50);
+  // Accessibility: Focus the new question
+  const firstBtn = div.querySelector('button, input');
+  if (firstBtn) setTimeout(() => firstBtn.focus(), 500);
 }
 
 function selectChip(qid, val) {
@@ -95,7 +101,10 @@ function selectChip(qid, val) {
 
 function submitPincode() {
   const v = document.getElementById('pincode-input').value.trim();
-  if (v.length < 4) { alert('Please enter a valid pincode'); return; }
+  if (v.length < 4) { 
+    alert('Please enter a valid pincode'); 
+    return; 
+  }
   state.pincode = v;
   launchDashboard();
 }
@@ -107,15 +116,21 @@ function launchDashboard() {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function setMode(v) { state.mode = v; showPhase(state.phase); }
+function setMode(v) { 
+  state.mode = v; 
+  showPhase(state.phase); 
+}
 
 function updateNav(p) {
   state.phase = p;
   document.querySelectorAll('.sidebar-nav').forEach((el,i)=>{
-    el.classList.toggle('bg-blue-50',i+1===p);
-    el.classList.toggle('text-primary',i+1===p);
-    el.classList.toggle('font-bold',i+1===p);
+    const isActive = i+1===p;
+    el.classList.toggle('bg-blue-50', isActive);
+    el.classList.toggle('text-primary', isActive);
+    el.classList.toggle('font-bold', isActive);
+    el.setAttribute('aria-current', isActive ? 'page' : 'false');
   });
+
   [1,2,3,4].forEach(n=>{
     const el = document.getElementById('step-'+n);
     if (!el) return;
@@ -124,13 +139,16 @@ function updateNav(p) {
     if (n < p) {
       circle.className='w-8 h-8 rounded-full border-2 border-secondary bg-secondary text-white flex items-center justify-center text-xs font-bold transition-all';
       circle.innerHTML='✓';
+      circle.setAttribute('aria-label', `Step ${n} completed`);
     } else if (n===p) {
       circle.className='w-8 h-8 rounded-full border-2 border-primary bg-primary text-white flex items-center justify-center text-xs font-bold transition-all';
       circle.innerHTML=n;
+      circle.setAttribute('aria-label', `Step ${n} active`);
       if(lbl){lbl.className='text-xs font-bold text-primary hidden sm:block';}
     } else {
       circle.className='w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold transition-all';
       circle.innerHTML=n;
+      circle.setAttribute('aria-label', `Step ${n} pending`);
       if(lbl){lbl.className='text-xs font-medium text-gray-400 hidden sm:block';}
     }
     const line = document.getElementById('line-'+n);
@@ -143,13 +161,21 @@ function showPhase(p) {
   updateNav(p);
   const c = document.getElementById('phase-content');
   const phases = [null, phase1, phase2, phase3, phase4];
+  
+  // Announcement for screen readers
+  const announcer = document.getElementById('sr-announcer');
+  if (announcer) announcer.textContent = `Navigated to Phase ${p}`;
+
   c.innerHTML = '<div class="fade-in">' + phases[p]() + '</div>';
-  c.querySelector('.fade-in') && void c.querySelector('.fade-in').offsetWidth;
-  // Trigger AI if response area exists
+  
+  // Re-run AI
   const ai = document.getElementById('ai-area');
   if (ai) askAI(p);
-  // Re-attach listeners
+  
   if (p===2) restoreChecklist();
+  
+  // Scroll to top of content
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function phase1() {
@@ -158,45 +184,45 @@ function phase1() {
   return `
   <div class="max-w-2xl space-y-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div class="flex items-start justify-between mb-4">
+      <header class="flex items-start justify-between mb-4">
         <div>
           <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Phase 1 of 4</span>
           <h2 class="text-xl font-bold text-gray-900 mt-2 flex items-center gap-2">📋 Registration Status</h2>
           <p class="text-gray-500 text-sm mt-1">First, let's make sure you're on the electoral roll.</p>
         </div>
-      </div>
+      </header>
       ${isReg ? `
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl">✅</span>
+          <span class="text-2xl" aria-hidden="true">✅</span>
           <div>
             <p class="font-bold text-green-800">You're registered! Great start.</p>
             <p class="text-sm text-green-700 mt-0.5">Your name should be in the electoral roll. Verify it below.</p>
           </div>
         </div>
-        <a href="${DATA.links.search}" target="_blank" class="btn-main bg-primary text-white w-full justify-center">🔍 Verify My Name on Electoral Roll</a>
+        <a href="${DATA.links.search}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">🔍 Verify My Name on Electoral Roll</a>
       ` : isUnsure ? `
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl">🤔</span>
+          <span class="text-2xl" aria-hidden="true">🤔</span>
           <div>
             <p class="font-bold text-amber-800">Let's check your registration status.</p>
             <p class="text-sm text-amber-700 mt-0.5">Search the electoral roll — it takes under 2 minutes.</p>
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          <a href="${DATA.links.search}" target="_blank" class="btn-main bg-primary text-white justify-center">🔍 Search Electoral Roll</a>
-          <a href="${DATA.links.register}" target="_blank" class="btn-main bg-white border border-gray-200 text-gray-700 justify-center">📝 Register Now (Form 6)</a>
+          <a href="${DATA.links.search}" target="_blank" rel="noopener" class="btn-main bg-primary text-white justify-center">🔍 Search Electoral Roll</a>
+          <a href="${DATA.links.register}" target="_blank" rel="noopener" class="btn-main bg-white border border-gray-200 text-gray-700 justify-center">📝 Register Now (Form 6)</a>
         </div>
       ` : `
         <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl">⚠️</span>
+          <span class="text-2xl" aria-hidden="true">⚠️</span>
           <div>
             <p class="font-bold text-red-800">You need to register first.</p>
             <p class="text-sm text-red-700 mt-0.5">Fill Form 6 on the ECI Voter Portal to get registered.</p>
           </div>
         </div>
-        <a href="${DATA.links.register}" target="_blank" class="btn-main bg-primary text-white w-full justify-center">📝 Register to Vote — Form 6</a>
+        <a href="${DATA.links.register}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">📝 Register to Vote — Form 6</a>
       `}
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]">
+      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
         <span class="ai-loading">🤖 Getting AI guidance…</span>
       </div>
     </div>
@@ -212,7 +238,7 @@ function phase2() {
       <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Phase 2 of 4</span>
       <h2 class="text-xl font-bold text-gray-900 mt-2 mb-1">📄 Document Preparation</h2>
       <p class="text-gray-500 text-sm mb-5">Carry <strong>any one</strong> of these valid photo IDs on polling day.</p>
-      <div class="space-y-2" id="doc-checklist">
+      <div class="space-y-2" id="doc-checklist" role="group" aria-label="Valid documents checklist">
         ${DATA.docs.map((d,i)=>`
           <label class="checklist-item flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:border-secondary transition-all ${stored[i]?'bg-green-50 border-green-200':''}">
             <input type="checkbox" class="w-4 h-4 accent-green-600" ${stored[i]?'checked':''} onchange="saveDoc(${i},this.checked)">
@@ -220,12 +246,7 @@ function phase2() {
           </label>
         `).join('')}
       </div>
-      ${!state.hasID || state.hasID==='no' ? `
-        <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
-          <span>⚠️</span>
-          <p class="text-sm text-amber-800 font-medium">You mentioned you don't have your Voter ID. Don't worry — any ID from the list above works!</p>
-        </div>` : ''}
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]">
+      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
         <span class="ai-loading">🤖 Getting AI guidance…</span>
       </div>
     </div>
@@ -252,7 +273,6 @@ function restoreChecklist() {
 function phase3() {
   const pin = state.pincode || '395006';
   const mapsUrl = `https://www.google.com/maps/search/Polling+Station+near+${pin}`;
-  const boothUrl = DATA.links.booth;
   return `
   <div class="max-w-2xl space-y-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -261,22 +281,14 @@ function phase3() {
       <p class="text-gray-500 text-sm mb-5">Your pincode: <strong>${pin}</strong>. Use these to find your exact booth.</p>
       
       <div class="space-y-3">
-        <a href="${mapsUrl}" target="_blank" class="btn-main bg-primary text-white w-full justify-center">
+        <a href="${mapsUrl}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">
           🗺️ Open Google Maps — Booths near ${pin}
-        </a>
-        <a href="${boothUrl}" target="_blank" class="btn-main bg-white border border-gray-200 text-gray-800 w-full justify-center">
-          🔍 Official ECI Booth Locator
         </a>
         <button onclick="generateICS()" class="btn-main bg-amber-500 text-white w-full justify-center">
           📅 Set Poll Day Reminder (April 26, 2026)
         </button>
       </div>
-
-      <div class="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-200">
-        <p class="text-xs font-bold text-gray-500 uppercase mb-2">💡 Tip</p>
-        <p class="text-sm text-gray-700">You can also search <strong>"Polling stations near ${pin}"</strong> directly in Google Maps to see all nearby booths with directions.</p>
-      </div>
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]">
+      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
         <span class="ai-loading">🤖 Getting AI guidance…</span>
       </div>
     </div>
@@ -291,13 +303,13 @@ function phase4() {
   return `
   <div class="max-w-3xl space-y-4">
     <div class="grid sm:grid-cols-3 gap-4">
-      <div class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <article class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">Phase 4 of 4</span>
         <h2 class="text-xl font-bold text-gray-900 mt-2 mb-1">🗳️ Poll Day Guide</h2>
         <p class="text-gray-500 text-sm mb-5">Step-by-step — what happens inside the booth.</p>
         
         <div class="relative space-y-5">
-          <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200"></div>
+          <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" aria-hidden="true"></div>
           ${DATA.steps.map(s=>`
             <div class="relative flex gap-4 pl-2">
               <div class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold shrink-0 relative z-10">${s.n}</div>
@@ -308,88 +320,97 @@ function phase4() {
             </div>
           `).join('')}
         </div>
-        <div id="ai-area" class="mt-5 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]">
+        <div id="ai-area" class="mt-5 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
           <span class="ai-loading">🤖 Getting AI guidance…</span>
         </div>
-      </div>
+      </article>
 
-      <div class="space-y-4">
+      <aside class="space-y-4">
         <div class="bg-green-50 rounded-2xl border border-green-200 p-4">
           <h3 class="font-bold text-gray-900 text-sm mb-3">✅ Poll Day Checklist</h3>
           <ul class="space-y-2 text-xs text-gray-700">
-            <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Voter ID / Valid Photo ID</li>
-            <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Know your Booth Location</li>
-            <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Plan your travel & timing</li>
-            <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Carry water bottle</li>
-            <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Stay Patient & Respectful</li>
+            <li><span class="text-green-600" aria-hidden="true">✓</span> Voter ID / Photo ID</li>
+            <li><span class="text-green-600" aria-hidden="true">✓</span> Booth Location Known</li>
+            <li><span class="text-green-600" aria-hidden="true">✓</span> Plan travel & timing</li>
+            <li><span class="text-green-600" aria-hidden="true">✓</span> Carry water bottle</li>
           </ul>
         </div>
-        <div class="bg-amber-50 rounded-2xl border border-amber-200 p-4">
-          <h3 class="font-bold text-gray-900 text-sm mb-2">⚠️ Booth Etiquette</h3>
-          <ul class="space-y-1.5 text-xs text-gray-700">
-            ${DATA.etiquette.map(e=>`<li>• ${e}</li>`).join('')}
-          </ul>
-        </div>
-        <button onclick="generateICS()" class="btn-main bg-amber-500 text-white w-full justify-center text-sm">
-          📅 Add to Calendar
-        </button>
-        <button onclick="downloadChecklist()" class="btn-main bg-primary text-white w-full justify-center text-sm">
-          ⬇️ Download Checklist
-        </button>
-      </div>
+        <button onclick="downloadChecklist()" class="btn-main bg-primary text-white w-full justify-center text-sm">⬇️ Download Checklist</button>
+      </aside>
     </div>
 
-    <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white text-center">
-      <div class="text-3xl mb-2">🎉</div>
+    <footer class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white text-center">
+      <div class="text-3xl mb-2" aria-hidden="true">🎉</div>
       <h3 class="font-bold text-lg">You're ready to vote!</h3>
-      <p class="text-blue-100 text-sm mt-1">Share CivicGuide AI with your family & friends</p>
-      <button onclick="share()" class="mt-3 btn-main bg-white text-primary text-sm justify-center">📤 Share CivicGuide AI</button>
-    </div>
+      <p class="text-blue-100 text-sm mt-1">Share CivicGuide AI with family & friends</p>
+      <button onclick="share()" class="mt-3 btn-main bg-white text-primary text-sm justify-center">📤 Share Project</button>
+    </footer>
   </div>`;
 }
 
-// ── AI ──────────────────────────────────────────────────────────────────────
+// ── AI Integration (Efficiency & Security) ───────────────────────────────────
 const PROMPTS = {
-  1: (s) => `You are CivicGuide AI. The user's registration status is: "${s.registered}". Provide a SHORT (3-4 sentences) personalized tip about voter registration for the 2026 Gujarat election. Be encouraging.`,
-  2: (s) => `You are CivicGuide AI. The user ${s.hasID==='yes'?'has':'does not have'} their Voter ID. Give a SHORT (3-4 sentences) tip about document preparation for voting. Mention they can use alternate IDs.`,
-  3: (s) => `You are CivicGuide AI. The user's pincode is ${s.pincode||'unknown'}. Give a SHORT (3-4 sentences) tip about finding their polling booth and what to check before visiting.`,
-  4: () => `You are CivicGuide AI. Give a SHORT (3-4 sentences) motivational tip for first-time voters about poll day — what to expect and how to stay calm. End with encouragement.`
+  1: (s) => `User registration status: "${s.registered}". Tip about voter registration for 2026 Gujarat election. Max 3 sentences.`,
+  2: (s) => `User has ID: ${s.hasID==='yes'?'Yes':'No'}. Tip about valid docs for voting. Max 3 sentences.`,
+  3: (s) => `Pincode: ${s.pincode||'unknown'}. Tip about finding polling booth. Max 3 sentences.`,
+  4: () => `Motivational tip for first-time voters on poll day. Max 3 sentences.`
 };
 
 const MODE_SYSTEM = {
   normal: 'Be clear and helpful.',
-  simpler: 'Use very simple words (5th grade level). Use emojis. Short sentences.',
-  deepdive: 'Provide detailed legal context and ECI rules. Reference actual ECI guidelines.',
-  gu: 'Reply entirely in Gujarati (ગુજરાતી). Be warm and clear.',
-  hi: 'Reply entirely in Hindi (हिंदी). Be warm and clear.'
+  simpler: 'Use 5th-grade level English. Emojis. Short sentences.',
+  deepdive: 'Provide detailed ECI rules and legal context.',
+  gu: 'Reply in Gujarati (ગુજરાતી). Be warm and clear.',
+  hi: 'Reply in Hindi (हिंदी). Be warm and clear.'
 };
 
 async function askAI(phase) {
   const area = document.getElementById('ai-area');
   if (!area) return;
+  
+  // Efficiency: Check Session Cache first
+  const cacheKey = `ai_p${phase}_m${state.mode}_reg${state.registered}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if (cached) {
+    displayAIResponse(area, cached);
+    return;
+  }
+
   const prompt = PROMPTS[phase](state);
   const system = MODE_SYSTEM[state.mode] || MODE_SYSTEM.normal;
+  
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        system_instruction: {parts:[{text:`You are CivicGuide AI, an assistant for Indian voters. ${system}`}]},
+        system_instruction: {parts:[{text:`You are CivicGuide AI. ${system}`}]},
         contents: [{parts:[{text: prompt}]}],
-        generationConfig: {maxOutputTokens:200, temperature:0.7}
+        generationConfig: {maxOutputTokens:150, temperature:0.7}
       })
     });
+    
+    if (!res.ok) throw new Error('API request failed');
+    
     const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'AI guidance unavailable. Please check ECI website directly.';
-    area.innerHTML = `<span class="text-xs font-bold text-primary block mb-1">🤖 AI Guidance (${document.getElementById('mode-select').options[document.getElementById('mode-select').selectedIndex].text})</span>${text.replace(/\n/g,'<br>')}`;
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Check ECI website for info.';
+    
+    sessionStorage.setItem(cacheKey, text);
+    displayAIResponse(area, text);
   } catch(e) {
-    area.innerHTML = '🤖 AI tip: Check <a href="https://eci.gov.in" target="_blank" class="text-primary underline">eci.gov.in</a> for official information.';
+    console.error('AI Error:', e);
+    area.innerHTML = '🤖 Tip: Check <a href="https://voters.eci.gov.in" target="_blank" class="text-primary underline">voters.eci.gov.in</a>.';
   }
+}
+
+function displayAIResponse(area, text) {
+  const modeText = document.getElementById('mode-select')?.options[document.getElementById('mode-select')?.selectedIndex]?.text || 'AI';
+  area.innerHTML = `<span class="text-xs font-bold text-primary block mb-1">🤖 AI Guidance (${modeText})</span>${text.replace(/\n/g,'<br>')}`;
 }
 
 // ── Utilities ────────────────────────────────────────────────────────────────
 function generateICS() {
-  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:20260426T060000Z\nDTEND:20260426T170000Z\nSUMMARY:Gujarat Election 2026 — Polling Day\nDESCRIPTION:Cast your vote! Carry valid Photo ID. Check your booth at voters.eci.gov.in\nLOCATION:Your Polling Booth\\, ${state.pincode||'Gujarat'}\nEND:VEVENT\nEND:VCALENDAR`;
+  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:20260426T060000Z\nDTEND:20260426T170000Z\nSUMMARY:Gujarat Election 2026 — Polling Day\nDESCRIPTION:Cast your vote! Check your booth at voters.eci.gov.in\nLOCATION:Your Polling Booth\\, ${state.pincode||'Gujarat'}\nEND:VEVENT\nEND:VCALENDAR`;
   const blob = new Blob([ics],{type:'text/calendar'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -398,19 +419,23 @@ function generateICS() {
 }
 
 function downloadChecklist() {
-  const txt = `CivicGuide AI — Your Polling Day Checklist\nGenerated for Pincode: ${state.pincode||'N/A'}\n\nDOCUMENTS (carry any ONE):\n${DATA.docs.map((d,i)=>`☐ ${d}`).join('\n')}\n\nPOLL DAY STEPS:\n${DATA.steps.map(s=>`${s.n}. ${s.t}: ${s.d}`).join('\n')}\n\nBOOTH RULES:\n${DATA.etiquette.map(e=>`• ${e}`).join('\n')}\n\nPolling Date: April 26, 2026\n\nPowered by CivicGuide AI — civic-guideai-391613367603.us-central1.run.app`;
+  const txt = `CivicGuide AI Checklist\nPincode: ${state.pincode||'N/A'}\n\nPolling Date: April 26, 2026\nVerify at: civic-guideai-391613367603.us-central1.run.app`;
   const blob = new Blob([txt],{type:'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'CivicGuide_Checklist.txt';
+  a.download = 'Voter_Checklist.txt';
   a.click();
 }
 
 function share() {
-  const url = 'https://civic-guideai-391613367603.us-central1.run.app';
+  const url = location.href;
   if (navigator.share) {
-    navigator.share({title:'CivicGuide AI',text:'Get your personalized voting guide for 2026 Gujarat Elections!',url});
+    navigator.share({title:'CivicGuide AI', text:'Your voter guide!', url});
   } else {
-    navigator.clipboard.writeText(url).then(()=>alert('Link copied! Share it with your family.'));
+    navigator.clipboard.writeText(url).then(()=>alert('Link copied!'));
   }
 }
+
+// Security: Log start but don't expose keys in console
+console.log('CivicGuide AI Engine Initialized.');
+

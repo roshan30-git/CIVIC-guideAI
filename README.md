@@ -1,66 +1,77 @@
 # CivicGuide AI 🗳️
 ### *Your Personal AI Voting Assistant for Gujarat 2026*
 
-**CivicGuide AI** is a smart, dynamic assistant designed to turn the overwhelming process of voting into a clear, personalized, 4-phase journey. Specifically built for first-time voters in Gujarat, it bridges the gap between complex election rules and practical action.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tech Stack: Vanilla JS](https://img.shields.io/badge/Stack-Vanilla%20JS-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![AI: Gemini 2.0 Flash](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-orange.svg)](https://deepmind.google/technologies/gemini/)
+[![Deployment: GCP Cloud Run](https://img.shields.io/badge/Deploy-GCP%20Cloud%20Run-green.svg)](https://cloud.google.com/run)
+
+**CivicGuide AI** is a state-of-the-art, dynamic assistant designed to turn the overwhelming process of voting into a clear, personalized, 4-phase journey. Built specifically for the 2026 Gujarat Elections, it bridges the gap between complex bureaucracy and first-time voters.
 
 ---
 
-## 🎯 Chosen Vertical: Civic Engagement & Voter Awareness
-We chose this vertical because first-time voters often feel intimidated by bureaucracy. Our solution humanizes the process using Gemini AI and Google’s ecosystem to provide a "GPS for Voting."
+## 🏗️ System Architecture
+The application follows a **Deterministic State Machine** architecture to ensure 100% reliability while leveraging **Generative AI** for personalized instruction.
+
+```mermaid
+graph TD
+    A[User Landing] --> B{Vibe Check Onboarding}
+    B -->|Registration Status| C[Phase 1: Voter Roll]
+    B -->|ID Availability| D[Phase 2: Document Prep]
+    B -->|Pincode| E[Phase 3: Booth Finder]
+    
+    C --> F[State Engine]
+    D --> F
+    E --> F
+    
+    F --> G[Gemini 2.0 Flash Assistant]
+    G -->|Mode Selector| H[Normal / Simpler / Deep-Dive / Multilingual]
+    
+    H --> I[Output: Personalized Voter Roadmap]
+    I --> J[Google Maps Integration]
+    I --> K[Google Calendar .ics]
+    I --> L[Official PDF Booth List]
+```
 
 ---
 
-## 🚀 How it Works (Logic & Approach)
-The application uses a **Deterministic State Machine** coupled with **Generative AI** to provide high-reliability guidance.
-
-1.  **Vibe Check (Onboarding)**: Instead of long forms, we ask 3 context-setting questions (Registration status, ID status, Pincode).
-2.  **Adaptive Roadmap**: Based on answers, the app dynamically locks/unlocks content across 4 phases:
-    *   **Phase 1: Registration**: Direct links to ECI Form 6 or verification portal.
-    *   **Phase 2: Documents**: A smart checklist of valid IDs based on the user's availability.
-    *   **Phase 3: Booth Finder**: Geographic discovery using Google Maps deep-links.
-    *   **Phase 4: Poll Day Guide**: A chronological "Inside the Booth" walkthrough.
-3.  **Multimodal AI Assistant**: Gemini 2.0 Flash provides context-aware tips in **Normal, Simpler (5th Grade), Deep-Dive, Gujarati, or Hindi** modes.
+## 🎯 Chosen Vertical: Civic Awareness & Voter Empowerment
+We chose this vertical to address **Information Asymmetry** in the electoral process. First-time voters often drop out of the process due to confusion; CivicGuide AI humanizes the experience through:
+- **Low-Cognitive Load UI**: Bento-style grid layout.
+- **Adaptive Personas**: Catering to different literacy levels (Simpler Mode) and languages (Gujarati/Hindi).
 
 ---
 
 ## 🛠️ Google Services Integration
--   **Gemini 2.0 Flash**: Powers the context-aware guidance with custom system instructions for each user persona.
--   **Google Maps**: Integrated deep-linking for Booth Discovery based on user-provided pincodes.
--   **Google Calendar**: Automatic `.ics` generation for the April 26, 2026, election date.
--   **Google Fonts**: Optimized typography using the 'Inter' family for maximum readability.
+- **Gemini 2.0 Flash**: Acts as the "Cognitive Core." It processes user context (e.g., "Not registered," "No Voter ID") and generates a 3-sentence actionable tip.
+- **Google Maps**: Dynamic deep-linking using `maps.google.com` API patterns to find polling stations based on user pincodes.
+- **Google Calendar**: Automatic `.ics` event generation for the April 26, 2026, poll day to increase voter turnout.
+- **Google Fonts**: Uses the 'Inter' family for accessibility and modern aesthetic.
 
 ---
 
-## ⚖️ Evaluation Criteria Alignment
-
-### 1. Code Quality & Structure
--   **Modular Logic**: Clean separation of concerns between `index.html` (UI), `app.js` (Logic), and `voter-tests.js` (Validation).
--   **Bento Grid UI**: A premium, state-of-the-art interface built with Vanilla Tailwind CSS.
-
-### 2. Security
--   **Sanitized Data**: No user data is sent to external servers except the anonymous context for Gemini prompts.
--   **Safe Storage**: Uses `sessionStorage` for temporary state to prevent persistent data leaks on shared devices.
-
-### 3. Efficiency
--   **AI Caching**: Responses are cached per phase/mode in `sessionStorage` to minimize API calls and save tokens.
--   **Zero-Dependency**: Built with Vanilla JS to ensure lightning-fast load times and a repository size of <100KB.
-
-### 4. Testing
--   **Built-in Audit**: Includes `voter-tests.js`, a custom automated test suite that validates the voter journey logic and data integrity.
-
-### 5. Accessibility (A11y)
--   **Screen Reader Ready**: Full ARIA landmark support (`aria-live`, `role="progressbar"`, `sr-only`).
--   **Inclusive Design**: Contrast-aware color palettes and simplified language modes for users with lower literacy.
+## ✨ Features & Evaluation Focus
+| Focus Area | Implementation Detail |
+| :--- | :--- |
+| **Code Quality** | Modular Vanilla JS logic with strict separation of State and UI. No heavy frameworks = instant load times. |
+| **Security** | `sessionStorage` caching and sanitized AI prompt construction. No persistent user data tracking. |
+| **Efficiency** | **AI Response Caching**: Responses are stored per phase/mode, reducing API latency and token consumption. |
+| **Testing** | Includes `voter-tests.js`, an automated browser-based test suite verifying 12+ core logic paths. |
+| **Accessibility** | ARIA-compliant landmarks, screen-reader announcers, and a "Simpler" mode for users with lower literacy. |
+| **Practicality** | Integrated **Official Surat North Polling List (PDF)** directly into the user journey based on geographic detection. |
 
 ---
 
-## 🏗️ Technical Setup & Running
-1.  **Clone**: `git clone https://github.com/roshan30-git/CIVIC-guideAI`
-2.  **Open**: Simply open `index.html` in any modern browser.
-3.  **Dev Mode**: Open the browser console to see the **CivicGuide AI Quality Audit** run automatically.
+## 🚀 Technical Setup
+1. **Clone**: `git clone https://github.com/roshan30-git/CIVIC-guideAI`
+2. **Launch**: Open `index.html` in any browser.
+3. **Verify**: Open the Console (F12) to see the **CivicGuide AI Quality Audit** pass automatically.
 
 ---
 
 ## 📌 Assumptions Made
--   **Election Date**: Assumed to be April 26, 2026, for the Gujarat State Elections (based on current 5-year cycles).
--   **Static Hosting**: Designed to be hosted on Google Cloud Run or any static provider without needing a heavy backend.
+- **Poll Date**: Set to April 26, 2026 (based on the Gujarat State Election 5-year cycle).
+- **Booth Discovery**: Uses Pincode-based Google Maps search as a primary locator for first-time voters.
+
+---
+*Built with ❤️ for PromptWars 2026*

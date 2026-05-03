@@ -64,16 +64,28 @@
     </nav>
 
     <!-- Hero -->
-    <main class="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 max-w-3xl mx-auto">
-      <div class="progress-line w-24 h-1 mx-auto rounded-full mb-6" aria-hidden="true"></div>
-      <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
-        Your Personal AI<br><span class="text-primary">Voting Assistant</span>
-      </h1>
-      <p class="text-lg text-gray-600 mb-8 max-w-xl">Bridging the information gap with personalized roadmaps for first-time voters.</p>
-
-      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10">
-        <button onclick="startOnboarding()" class="btn-main bg-primary text-white shadow-lg">✅ Create My Voting Plan</button>
-        <a href="#how-it-works" class="btn-main bg-white border border-gray-200 text-gray-700">Explore Features ↓</a>
+      <!-- Hero Screen -->
+      <section id="screen-hero" class="max-w-4xl mx-auto px-4 py-12 sm:py-20 text-center fade-in">
+        <span class="inline-block text-xs font-bold text-primary bg-blue-50 px-3 py-1 rounded-full mb-6 border border-blue-100 uppercase tracking-widest">Gujarat Elections 2026</span>
+        <h1 class="text-4xl sm:text-6xl font-black text-gray-900 leading-tight mb-6">
+          Your Personal AI <br><span class="text-primary">Voting Assistant</span>
+        </h1>
+        <p class="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+          Get a personalized roadmap to the 2026 Gujarat Elections. We guide you through registration, documents, and finding your booth.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <select onchange="state.lang=this.value; state.mode=this.value==='en'?'normal':this.value;" class="w-full sm:w-auto btn-main bg-white border-2 border-gray-200 text-gray-700 px-6 justify-center">
+            <option value="en">English</option>
+            <option value="gu">ગુજરાતી (Gujarati)</option>
+            <option value="hi">हिंदी (Hindi)</option>
+          </select>
+          <button onclick="startOnboarding()" class="w-full sm:w-auto btn-main bg-primary text-white px-10 py-4 text-lg justify-center shadow-xl shadow-blue-200 hover:-translate-y-1">
+            Get My Roadmap →
+          </button>
+        </div>
+      </section>
+  <a href="#how-it-works" class="btn-main bg-white border border-gray-200 text-gray-700">Explore Features ↓</a>
       </div>
 
       <div class="grid grid-cols-3 gap-6 max-w-sm mx-auto text-center" aria-label="Project Highlights">

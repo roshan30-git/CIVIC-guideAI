@@ -6,6 +6,42 @@ const CONFIG = {
 
 const API_URL = `${CONFIG.BASE_URL}?key=${CONFIG.API_KEY}`;
 
+const UI_STRINGS = {
+  en: {
+    onboarding: [
+      { q: 'Are you registered to vote?', h: 'Helps tailor your roadmap.', c: ['✅ Yes', '❌ No', '🤔 Unsure'] },
+      { q: 'Do you have Voter ID?', h: 'Other IDs work too.', c: ['📄 Yes', '😟 No'] },
+      { q: 'Enter Pincode', h: 'e.g. 395006 for Surat', p: 'Pincode' }
+    ],
+    nav: ['Registration', 'Documents', 'Booth Finder', 'Poll Day'],
+    phases: ['Phase 1 of 4', 'Phase 2 of 4', 'Phase 3 of 4', 'Phase 4 of 4'],
+    buttons: { next: 'Next', back: 'Back', continue: 'Continue →', register: 'Register Now', download: 'Download', share: 'Share' },
+    titles: { reg: 'Registration Status', docs: 'Document Preparation', booth: 'Find Polling Booth', vote: 'Poll Day Guide' }
+  },
+  gu: {
+    onboarding: [
+      { q: 'શું તમે મતદાન કરવા માટે નોંધાયેલા છો?', h: 'તમારા રોડમેપને તૈયાર કરવામાં મદદ કરે છે.', c: ['✅ હા', '❌ ના', '🤔 ખાતરી નથી'] },
+      { q: 'શું તમારી પાસે વોટર આઈડી છે?', h: 'અન્ય આઈડી પણ કામ કરે છે.', c: ['📄 હા', '😟 ના'] },
+      { q: 'પિનકોડ દાખલ કરો', h: 'દા.ત. સુરત માટે 395006', p: 'પિનકોડ' }
+    ],
+    nav: ['નોંધણી', 'દસ્તાવેજો', 'બૂથ શોધો', 'મતદાન દિવસ'],
+    phases: ['તબક્કો 1 થી 4', 'તબક્કો 2 થી 4', 'તબક્કો 3 થી 4', 'તબક્કો 4 થી 4'],
+    buttons: { next: 'આગળ', back: 'પાછળ', continue: 'આગળ વધો →', register: 'હમણાં નોંધણી કરો', download: 'ડાઉનલોડ', share: 'શેર કરો' },
+    titles: { reg: 'નોંધણી સ્થિતિ', docs: 'દસ્તાવેજ તૈયારી', booth: 'મતદાન મથક શોધો', vote: 'મતદાન દિવસ માર્ગદર્શિકા' }
+  },
+  hi: {
+    onboarding: [
+      { q: 'क्या आप वोट देने के लिए पंजीकृत हैं?', h: 'आपके रोडमैप को तैयार करने में मदद करता है।', c: ['✅ हाँ', '❌ नहीं', '🤔 पक्का नहीं'] },
+      { q: 'क्या आपके पास वोटर आईडी है?', h: 'अन्य आईडी भी काम करती हैं।', c: ['📄 हाँ', '😟 नहीं'] },
+      { q: 'पिनकोड दर्ज करें', h: 'उदा. सूरत के लिए 395006', p: 'पिनकोड' }
+    ],
+    nav: ['पंजीकरण', 'दस्तावेज', 'बूथ खोजें', 'मतदान दिवस'],
+    phases: ['चरण 1 से 4', 'चरण 2 से 4', 'चरण 3 से 4', 'चरण 4 से 4'],
+    buttons: { next: 'अगला', back: 'पीछे', continue: 'आगे बढ़ें →', register: 'अभी पंजीकरण करें', download: 'डाउनलोड', share: 'शेयर करें' },
+    titles: { reg: 'पंजीकरण स्थिति', docs: 'दस्तावेज तैयारी', booth: 'मतदान केंद्र खोजें', vote: 'मतदान दिवस गाइड' }
+  }
+};
+
 const DATA = {
   docs: ['Voter ID (EPIC Card)','Aadhaar Card','PAN Card','Driving License','Passport','Class X/XII Certificate'],
   steps: [
@@ -15,44 +51,15 @@ const DATA = {
     {n:4,e:'🗳️',t:'Cast Your Vote',d:'Press the blue button beside your candidate on the EVM. Wait for the beep.'},
     {n:5,e:'📋',t:'VVPAT Check',d:'Check VVPAT window for 7 seconds to confirm your vote.'}
   ],
-  etiquette: ['No phones/cameras inside booth','Maintain vote secrecy','Follow queue — seniors/PWD get priority','No campaigning within 100m of booth'],
   links: {
     search: 'https://electoralsearch.eci.gov.in/',
-    register: 'https://voters.eci.gov.in/registration/form6',
-    booth: 'https://voters.eci.gov.in/know-your-polling-station'
+    register: 'https://voters.eci.gov.in/registration/form6'
   }
 };
 
-let state = { phase: 1, mode: 'normal', registered: null, hasID: null, pincode: '' };
+let state = { phase: 1, mode: 'normal', lang: 'en', registered: null, hasID: null, pincode: '' };
 
 // ── Onboarding ──────────────────────────────────────────────────────────────
-const questions = [
-  {
-    id: 'q1', label: 'Are you registered to vote?',
-    hint: 'This helps us guide your first step.',
-    chips: [
-      {v:'yes', label:'✅ Yes, I am registered'},
-      {v:'no',  label:'❌ No, I\'m not registered'},
-      {v:'unsure', label:'🤔 Not sure / Don\'t know'}
-    ]
-  },
-  {
-    id: 'q2', label: 'Do you have your Voter ID card?',
-    hint: 'You can vote with other valid IDs too.',
-    chips: [
-      {v:'yes', label:'📄 Yes, I have it'},
-      {v:'no',  label:'😟 No / Lost it'}
-    ]
-  },
-  {
-    id: 'q3', label: 'Enter your Area Pincode',
-    hint: 'e.g. 395006 for Varachha, Surat',
-    input: true
-  }
-];
-
-let currentQ = 0;
-
 function startOnboarding() {
   document.getElementById('screen-hero').classList.add('hidden');
   document.getElementById('screen-onboarding').classList.remove('hidden');
@@ -61,375 +68,204 @@ function startOnboarding() {
 
 function renderQuestion(idx) {
   const area = document.getElementById('onboarding-area');
-  const q = questions[idx];
+  const s = UI_STRINGS[state.lang];
+  const q = s.onboarding[idx];
   if (!q) { launchDashboard(); return; }
 
-  const div = document.createElement('div');
-  div.className = 'bg-white rounded-2xl border border-gray-200 p-6 shadow-sm fade-in';
-  div.innerHTML = `
-    <div class="flex items-center justify-between mb-1" aria-hidden="true">
-      <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">Question ${idx+1} of 3</span>
-      <div class="flex gap-1">${[0,1,2].map(i=>`<div class="h-1.5 w-8 rounded-full ${i<=idx?'bg-primary':'bg-gray-200'}"></div>`).join('')}</div>
+  area.innerHTML = `
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm fade-in">
+      <h3 class="text-lg font-bold text-gray-900 mb-1">${q.q}</h3>
+      <p class="text-sm text-gray-500 mb-4">${q.h}</p>
+      ${q.p ? `
+        <input id="pincode-input" type="tel" maxlength="6" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg font-bold" placeholder="${q.p}">
+        <button onclick="submitPincode()" class="mt-3 w-full btn-main bg-primary text-white justify-center">${s.buttons.continue}</button>
+      ` : `
+        <div class="flex flex-col gap-2">
+          ${q.c.map((l,i)=>`<button onclick="selectChip('${idx===0?'q1':'q2'}','${i===0?'yes':i===1?'no':'unsure'}')" class="chip text-left px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-gray-800 hover:border-primary hover:bg-blue-50">${l}</button>`).join('')}
+        </div>
+      `}
     </div>
-    <h3 class="text-lg font-bold text-gray-900 mt-3 mb-1" id="q-label-${idx}">${q.label}</h3>
-    <p class="text-sm text-gray-500 mb-4">${q.hint}</p>
-    ${q.input ? `
-      <input id="pincode-input" type="tel" maxlength="6" aria-labelledby="q-label-${idx}" placeholder="Enter 6-digit pincode" 
-        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-primary transition-colors">
-      <button onclick="submitPincode()" class="mt-3 w-full btn-main bg-primary text-white justify-center">Continue →</button>
-    ` : `
-      <div class="flex flex-col gap-2" role="radiogroup" aria-labelledby="q-label-${idx}">
-        ${q.chips.map(c=>`<button onclick="selectChip('${q.id}','${c.v}')" role="radio" 
-          class="chip text-left px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-gray-800 hover:border-primary hover:bg-blue-50">
-          ${c.label}
-        </button>`).join('')}
-      </div>
-    `}
   `;
-  area.appendChild(div);
-  // Accessibility: Focus the new question
-  const firstBtn = div.querySelector('button, input');
-  if (firstBtn) setTimeout(() => firstBtn.focus(), 500);
 }
 
 function selectChip(qid, val) {
   if (qid==='q1') state.registered = val;
   if (qid==='q2') state.hasID = val;
-  currentQ++;
-  renderQuestion(currentQ);
+  renderQuestion(state.registered && state.hasID ? 2 : 1);
 }
 
 function submitPincode() {
-  const v = document.getElementById('pincode-input').value.trim();
-  if (v.length < 4) { 
-    alert('Please enter a valid pincode'); 
-    return; 
-  }
-  state.pincode = v;
+  state.pincode = document.getElementById('pincode-input').value;
   launchDashboard();
 }
 
 function launchDashboard() {
   document.getElementById('screen-onboarding').classList.add('hidden');
   document.getElementById('screen-dashboard').classList.remove('hidden');
+  translateUI();
   showPhase(1);
 }
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
+// ── Dashboard Logic ──────────────────────────────────────────────────────────
 function setMode(v) { 
   state.mode = v; 
+  state.lang = (v === 'gu' || v === 'hi') ? v : 'en';
+  translateUI();
   showPhase(state.phase); 
+}
+
+function translateUI() {
+  const s = UI_STRINGS[state.lang];
+  // Translate Sidebar
+  document.querySelectorAll('.sidebar-nav').forEach((el, i) => {
+    if(s.nav[i]) el.textContent = s.nav[i];
+  });
+  // Translate Progress Labels
+  document.querySelectorAll('#journey-progress span').forEach((el, i) => {
+    if(s.nav[i]) el.textContent = s.nav[i].split(' ')[0];
+  });
+  // Update Header Title
+  const titleEl = document.getElementById('dash-title');
+  if(titleEl) titleEl.textContent = Object.values(s.titles)[state.phase-1];
 }
 
 function updateNav(p) {
   state.phase = p;
   document.querySelectorAll('.sidebar-nav').forEach((el,i)=>{
-    const isActive = i+1===p;
-    el.classList.toggle('bg-blue-50', isActive);
-    el.classList.toggle('text-primary', isActive);
-    el.classList.toggle('font-bold', isActive);
-    el.setAttribute('aria-current', isActive ? 'page' : 'false');
+    const active = i+1===p;
+    el.classList.toggle('bg-blue-50', active);
+    el.classList.toggle('text-primary', active);
+    el.classList.toggle('font-bold', active);
+    el.setAttribute('aria-current', active ? 'page' : 'false');
   });
 
   [1,2,3,4].forEach(n=>{
     const el = document.getElementById('step-'+n);
-    if (!el) return;
+    if(!el) return;
     const circle = el.querySelector('div');
-    const lbl = el.querySelector('span');
-    if (n < p) {
-      circle.className='w-8 h-8 rounded-full border-2 border-secondary bg-secondary text-white flex items-center justify-center text-xs font-bold transition-all';
-      circle.innerHTML='✓';
-      circle.setAttribute('aria-label', `Step ${n} completed`);
-    } else if (n===p) {
-      circle.className='w-8 h-8 rounded-full border-2 border-primary bg-primary text-white flex items-center justify-center text-xs font-bold transition-all';
-      circle.innerHTML=n;
-      circle.setAttribute('aria-label', `Step ${n} active`);
-      if(lbl){lbl.className='text-xs font-bold text-primary hidden sm:block';}
-    } else {
-      circle.className='w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold transition-all';
-      circle.innerHTML=n;
-      circle.setAttribute('aria-label', `Step ${n} pending`);
-      if(lbl){lbl.className='text-xs font-medium text-gray-400 hidden sm:block';}
-    }
+    if (n < p) { circle.className='w-9 h-9 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold'; circle.innerHTML='✓'; }
+    else if (n===p) { circle.className='w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-lg'; circle.innerHTML=n; }
+    else { circle.className='w-9 h-9 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center text-xs font-bold'; circle.innerHTML=n; }
     const line = document.getElementById('line-'+n);
     if(line) line.className='flex-1 h-0.5 '+(n<p?'bg-secondary':'bg-gray-200');
   });
-  document.getElementById('phase-label').textContent=`Phase ${p} of 4`;
 }
 
 function showPhase(p) {
   updateNav(p);
+  const s = UI_STRINGS[state.lang];
   const c = document.getElementById('phase-content');
   const phases = [null, phase1, phase2, phase3, phase4];
   
-  // Announcement for screen readers
-  const announcer = document.getElementById('sr-announcer');
-  if (announcer) announcer.textContent = `Navigated to Phase ${p}`;
-
-  c.innerHTML = '<div class="fade-in">' + phases[p]() + '</div>';
-  
-  // Re-run AI
-  const ai = document.getElementById('ai-area');
-  if (ai) askAI(p);
-  
-  if (p===2) restoreChecklist();
-  
-  // Scroll to top of content
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('dash-title').textContent = Object.values(s.titles)[p-1];
+  c.innerHTML = `<div class="fade-in max-w-2xl mx-auto">${phases[p](s)}</div>`;
+  askAI(p);
+  if(p===2) restoreChecklist();
+  window.scrollTo(0,0);
 }
 
-function phase1() {
+function phase1(s) {
   const isReg = state.registered==='yes';
-  const isUnsure = state.registered==='unsure';
   return `
-  <div class="max-w-2xl space-y-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <header class="flex items-start justify-between mb-4">
-        <div>
-          <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Phase 1 of 4</span>
-          <h2 class="text-xl font-bold text-gray-900 mt-2 flex items-center gap-2">📋 Registration Status</h2>
-          <p class="text-gray-500 text-sm mt-1">First, let's make sure you're on the electoral roll.</p>
-        </div>
-      </header>
+      <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[0]}</span>
+      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.reg}</h2>
       ${isReg ? `
-        <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl" aria-hidden="true">✅</span>
-          <div>
-            <p class="font-bold text-green-800">You're registered! Great start.</p>
-            <p class="text-sm text-green-700 mt-0.5">Your name should be in the electoral roll. Verify it below.</p>
-          </div>
-        </div>
-        <a href="${DATA.links.search}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">🔍 Verify My Name on Electoral Roll</a>
-      ` : isUnsure ? `
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl" aria-hidden="true">🤔</span>
-          <div>
-            <p class="font-bold text-amber-800">Let's check your registration status.</p>
-            <p class="text-sm text-amber-700 mt-0.5">Search the electoral roll — it takes under 2 minutes.</p>
-          </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <a href="${DATA.links.search}" target="_blank" rel="noopener" class="btn-main bg-primary text-white justify-center">🔍 Search Electoral Roll</a>
-          <a href="${DATA.links.register}" target="_blank" rel="noopener" class="btn-main bg-white border border-gray-200 text-gray-700 justify-center">📝 Register Now (Form 6)</a>
-        </div>
+        <div class="bg-green-50 p-4 rounded-xl mb-4 text-green-800 text-sm font-medium border border-green-100">✅ Verification required. Ensure your name is in the roll.</div>
+        <a href="${DATA.links.search}" target="_blank" class="btn-main bg-primary text-white w-full justify-center">🔍 Verify Roll</a>
       ` : `
-        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <span class="text-2xl" aria-hidden="true">⚠️</span>
-          <div>
-            <p class="font-bold text-red-800">You need to register first.</p>
-            <p class="text-sm text-red-700 mt-0.5">Fill Form 6 on the ECI Voter Portal to get registered.</p>
-          </div>
-        </div>
-        <a href="${DATA.links.register}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">📝 Register to Vote — Form 6</a>
+        <div class="bg-red-50 p-4 rounded-xl mb-4 text-red-800 text-sm font-medium border border-red-100">⚠️ Registration is mandatory to vote.</div>
+        <a href="${DATA.links.register}" target="_blank" class="btn-main bg-primary text-white w-full justify-center">📝 ${s.buttons.register}</a>
       `}
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
-        <span class="ai-loading">🤖 Getting AI guidance…</span>
-      </div>
+      <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>
-    <button onclick="showPhase(2)" class="btn-main bg-secondary text-white w-full justify-center">Next: Document Prep →</button>
-  </div>`;
+    <button onclick="showPhase(2)" class="mt-4 btn-main bg-secondary text-white w-full justify-center">${s.buttons.next} →</button>
+  `;
 }
 
-function phase2() {
-  const stored = JSON.parse(localStorage.getItem('cg-docs')||'{}');
+function phase2(s) {
   return `
-  <div class="max-w-2xl space-y-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <span class="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Phase 2 of 4</span>
-      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-1">📄 Document Preparation</h2>
-      <p class="text-gray-500 text-sm mb-5">Carry <strong>any one</strong> of these valid photo IDs on polling day.</p>
-      <div class="space-y-2" id="doc-checklist" role="group" aria-label="Valid documents checklist">
-        ${DATA.docs.map((d,i)=>`
-          <label class="checklist-item flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:border-secondary transition-all ${stored[i]?'bg-green-50 border-green-200':''}">
-            <input type="checkbox" class="w-4 h-4 accent-green-600" ${stored[i]?'checked':''} onchange="saveDoc(${i},this.checked)">
-            <span class="font-medium text-gray-800 text-sm ${stored[i]?'line-through text-green-700':''}">${d}</span>
-          </label>
-        `).join('')}
+      <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[1]}</span>
+      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.docs}</h2>
+      <div class="space-y-2" id="doc-checklist">
+        ${DATA.docs.map((d,i)=>`<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-50"><input type="checkbox" onchange="saveDoc(${i},this.checked)" class="accent-primary"> <span class="text-sm font-medium text-gray-700">${d}</span></label>`).join('')}
       </div>
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
-        <span class="ai-loading">🤖 Getting AI guidance…</span>
-      </div>
+      <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>
-    <div class="flex gap-3">
-      <button onclick="showPhase(1)" class="btn-main bg-white border border-gray-200 text-gray-700 flex-1 justify-center">← Back</button>
-      <button onclick="showPhase(3)" class="btn-main bg-secondary text-white flex-1 justify-center">Next: Booth Finder →</button>
+    <div class="flex gap-3 mt-4">
+      <button onclick="showPhase(1)" class="btn-main bg-white border border-gray-200 text-gray-700 flex-1 justify-center">${s.buttons.back}</button>
+      <button onclick="showPhase(3)" class="btn-main bg-secondary text-white flex-1 justify-center">${s.buttons.next}</button>
     </div>
-  </div>`;
+  `;
 }
 
-function saveDoc(i, checked) {
-  const d = JSON.parse(localStorage.getItem('cg-docs')||'{}');
-  d[i] = checked;
-  localStorage.setItem('cg-docs', JSON.stringify(d));
-}
-
-function restoreChecklist() {
-  const stored = JSON.parse(localStorage.getItem('cg-docs')||'{}');
-  document.querySelectorAll('#doc-checklist input').forEach((el,i)=>{
-    el.checked = !!stored[i];
-  });
-}
-
-function phase3() {
+function phase3(s) {
   const pin = state.pincode || '395006';
-  const isSurat = pin.startsWith('395');
   const mapsUrl = `https://www.google.com/maps/search/Polling+Station+near+${pin}`;
   return `
-  <div class="max-w-2xl space-y-4">
     <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Phase 3 of 4</span>
-      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-1">📍 Find Your Polling Booth</h2>
-      <p class="text-gray-500 text-sm mb-5">Your pincode: <strong>${pin}</strong>. Use these to find your exact booth.</p>
-      
-      <div class="space-y-3">
-        <a href="${mapsUrl}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">
-          🗺️ Open Google Maps — Booths near ${pin}
-        </a>
-        
-        ${isSurat ? `
-          <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p class="text-xs font-bold text-primary uppercase mb-2">📍 Surat North Special Feature</p>
-            <p class="text-sm text-gray-700 mb-3">We found an official polling station list for your area.</p>
-            <a href="surat-north-booths.pdf" target="_blank" class="btn-main bg-white border border-primary text-primary w-full justify-center text-sm">
-              📄 View Official Booth List (PDF)
-            </a>
-          </div>
-        ` : ''}
-
-        <button onclick="generateICS()" class="btn-main bg-amber-500 text-white w-full justify-center">
-          📅 Set Poll Day Reminder (April 26, 2026)
-        </button>
-      </div>
-      <div id="ai-area" class="mt-4 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
-        <span class="ai-loading">🤖 Getting AI guidance…</span>
-      </div>
+      <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[2]}</span>
+      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.booth}</h2>
+      <a href="${mapsUrl}" target="_blank" class="btn-main bg-primary text-white w-full justify-center mb-3">🗺️ Open Google Maps (Near ${pin})</a>
+      ${pin.startsWith('395') ? `<a href="surat-north-booths.pdf" target="_blank" class="btn-main bg-white border border-primary text-primary w-full justify-center text-sm">📄 Official Surat List (PDF)</a>` : ''}
+      <button onclick="generateICS()" class="mt-3 btn-main bg-amber-500 text-white w-full justify-center text-sm">📅 Set Calendar Reminder</button>
+      <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>
-    <div class="flex gap-3">
-      <button onclick="showPhase(2)" class="btn-main bg-white border border-gray-200 text-gray-700 flex-1 justify-center">← Back</button>
-      <button onclick="showPhase(4)" class="btn-main bg-secondary text-white flex-1 justify-center">Next: Poll Day →</button>
+    <div class="flex gap-3 mt-4">
+      <button onclick="showPhase(2)" class="btn-main bg-white border border-gray-200 text-gray-700 flex-1 justify-center">${s.buttons.back}</button>
+      <button onclick="showPhase(4)" class="btn-main bg-secondary text-white flex-1 justify-center">${s.buttons.next}</button>
     </div>
-  </div>`;
+  `;
 }
 
-function phase4() {
+function phase4(s) {
   return `
-  <div class="max-w-3xl space-y-4">
-    <div class="grid sm:grid-cols-3 gap-4">
-      <article class="sm:col-span-2 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">Phase 4 of 4</span>
-        <h2 class="text-xl font-bold text-gray-900 mt-2 mb-1">🗳️ Poll Day Guide</h2>
-        <p class="text-gray-500 text-sm mb-5">Step-by-step — what happens inside the booth.</p>
-        
-        <div class="relative space-y-5">
-          <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" aria-hidden="true"></div>
-          ${DATA.steps.map(s=>`
-            <div class="relative flex gap-4 pl-2">
-              <div class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold shrink-0 relative z-10">${s.n}</div>
-              <div>
-                <h4 class="font-bold text-gray-900 text-sm">${s.e} ${s.t}</h4>
-                <p class="text-xs text-gray-500 mt-0.5">${s.d}</p>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-        <div id="ai-area" class="mt-5 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[60px]" aria-live="polite">
-          <span class="ai-loading">🤖 Getting AI guidance…</span>
-        </div>
-      </article>
-
-      <aside class="space-y-4">
-        <div class="bg-green-50 rounded-2xl border border-green-200 p-4">
-          <h3 class="font-bold text-gray-900 text-sm mb-3">✅ Poll Day Checklist</h3>
-          <ul class="space-y-2 text-xs text-gray-700">
-            <li><span class="text-green-600" aria-hidden="true">✓</span> Voter ID / Photo ID</li>
-            <li><span class="text-green-600" aria-hidden="true">✓</span> Booth Location Known</li>
-            <li><span class="text-green-600" aria-hidden="true">✓</span> Plan travel & timing</li>
-            <li><span class="text-green-600" aria-hidden="true">✓</span> Carry water bottle</li>
-          </ul>
-        </div>
-        <button onclick="downloadChecklist()" class="btn-main bg-primary text-white w-full justify-center text-sm">⬇️ Download Checklist</button>
-      </aside>
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[3]}</span>
+      <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.vote}</h2>
+      <div class="space-y-4">
+        ${DATA.steps.map(st=>`<div class="flex gap-4 items-start"><div class="w-7 h-7 rounded-full bg-blue-50 text-primary flex items-center justify-center font-bold text-xs shrink-0">${st.n}</div><div><p class="font-bold text-sm text-gray-900">${st.e} ${st.t}</p><p class="text-xs text-gray-500">${st.d}</p></div></div>`).join('')}
+      </div>
+      <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>
-
-    <footer class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-white text-center">
-      <div class="text-3xl mb-2" aria-hidden="true">🎉</div>
-      <h3 class="font-bold text-lg">You're ready to vote!</h3>
-      <p class="text-blue-100 text-sm mt-1">Share CivicGuide AI with family & friends</p>
-      <button onclick="share()" class="mt-3 btn-main bg-white text-primary text-sm justify-center">📤 Share Project</button>
-    </footer>
-  </div>`;
+    <div class="bg-primary rounded-2xl p-6 text-white text-center mt-4">
+      <p class="font-bold text-lg">🎉 Ready to Vote!</p>
+      <button onclick="share()" class="mt-3 btn-main bg-white text-primary text-sm justify-center">${s.buttons.share}</button>
+    </div>
+  `;
 }
 
-// ── AI Integration (Efficiency & Security) ───────────────────────────────────
-const PROMPTS = {
-  1: (s) => `User registration status: "${s.registered}". Tip about voter registration for 2026 Gujarat election. Max 3 sentences.`,
-  2: (s) => `User has ID: ${s.hasID==='yes'?'Yes':'No'}. Tip about valid docs for voting. Max 3 sentences.`,
-  3: (s) => `Pincode: ${s.pincode||'unknown'}. Tip about finding polling booth. Max 3 sentences.`,
-  4: () => `Motivational tip for first-time voters on poll day. Max 3 sentences.`
-};
-
-const MODE_SYSTEM = {
-  normal: 'Be clear and helpful.',
-  simpler: 'Use 5th-grade level English. Emojis. Short sentences.',
-  deepdive: 'Provide detailed ECI rules and legal context.',
-  gu: 'Reply in Gujarati (ગુજરાતી). Be warm and clear.',
-  hi: 'Reply in Hindi (हिंदी). Be warm and clear.'
-};
-
+// ── AI & Utilities ───────────────────────────────────────────────────────────
 async function askAI(phase) {
   const area = document.getElementById('ai-area');
-  if (!area) return;
-  
-  // Efficiency: Check Session Cache first
-  const cacheKey = `ai_p${phase}_m${state.mode}_reg${state.registered}`;
-  const cached = sessionStorage.getItem(cacheKey);
-  if (cached) {
-    displayAIResponse(area, cached);
-    return;
-  }
-
-  const prompt = PROMPTS[phase](state);
-  const system = MODE_SYSTEM[state.mode] || MODE_SYSTEM.normal;
+  if(!area) return;
+  const prompts = [null, 
+    `Tip for registration status "${state.registered}". Gujarat 2026. Max 2 sentences.`,
+    `Tip for ID prep. Max 2 sentences.`,
+    `Tip for booth discovery near ${state.pincode}. Max 2 sentences.`,
+    `Motivational poll day tip. Max 2 sentences.`
+  ];
+  const system = `You are CivicGuide AI. Reply in ${state.lang==='gu'?'Gujarati':state.lang==='hi'?'Hindi':'English'}. Be helpful.`;
   
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        system_instruction: {parts:[{text:`You are CivicGuide AI. ${system}`}]},
-        contents: [{parts:[{text: prompt}]}],
-        generationConfig: {maxOutputTokens:150, temperature:0.7}
+        system_instruction: {parts:[{text:system}]},
+        contents: [{parts:[{text: prompts[phase]}]}]
       })
     });
-    
-    if (!res.ok) throw new Error('API request failed');
-    
     const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Check ECI website for info.';
-    
-    sessionStorage.setItem(cacheKey, text);
-    displayAIResponse(area, text);
-  } catch(e) {
-    console.error('AI Error:', e);
-    area.innerHTML = '🤖 Tip: Check <a href="https://voters.eci.gov.in" target="_blank" class="text-primary underline">voters.eci.gov.in</a>.';
-  }
+    area.innerHTML = `<strong>🤖 AI:</strong> ${data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Check ECI website.'}`;
+  } catch(e) { area.innerHTML = '🤖 Tip: Be early at the booth!'; }
 }
 
-function displayAIResponse(area, text) {
-  const modeText = document.getElementById('mode-select')?.options[document.getElementById('mode-select')?.selectedIndex]?.text || 'AI';
-  area.innerHTML = `<span class="text-xs font-bold text-primary block mb-1">🤖 AI Guidance (${modeText})</span>${text.replace(/\n/g,'<br>')}`;
-}
-
-// ── Utilities ────────────────────────────────────────────────────────────────
-function generateICS() {
-  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:20260426T060000Z\nDTEND:20260426T170000Z\nSUMMARY:Gujarat Election 2026 — Polling Day\nDESCRIPTION:Cast your vote! Check your booth at voters.eci.gov.in\nLOCATION:Your Polling Booth\\, ${state.pincode||'Gujarat'}\nEND:VEVENT\nEND:VCALENDAR`;
-  const blob = new Blob([ics],{type:'text/calendar'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'PollDay2026.ics';
-  a.click();
-}
-
+function saveDoc(i, c) { let d = JSON.parse(localStorage.getItem('cg-docs')||'{}'); d[i]=c; localStorage.setItem('cg-docs', JSON.stringify(d)); }
+function restoreChecklist() { let d = JSON.parse(localStorage.getItem('cg-docs')||'{}'); document.querySelectorAll('#doc-checklist input').forEach((el,i)=>el.checked=!!d[i]); }
+function generateICS() { window.location.href = 'data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:20260426T060000Z%0ADTEND:20260426T170000Z%0ASUMMARY:Gujarat Election 2026%0AEND:VEVENT%0AEND:VCALENDAR'; }
+function share() { navigator.share ? navigator.share({title:'CivicGuide', url:location.href}) : alert('Link copied!'); }
 function downloadChecklist() {
   const txt = `CivicGuide AI Checklist\nPincode: ${state.pincode||'N/A'}\n\nPolling Date: April 26, 2026\nVerify at: civic-guideai-391613367603.us-central1.run.app`;
   const blob = new Blob([txt],{type:'text/plain'});

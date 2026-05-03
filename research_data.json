@@ -1,0 +1,77 @@
+{
+  "project": "CivicGuide AI",
+  "location": "Surat, Gujarat",
+  "election_year": 2026,
+  "data_sources": {
+    "ECI": "https://eci.gov.in",
+    "Voter_Portal": "https://voters.eci.gov.in",
+    "CEO_Gujarat": "https://ceo.gujarat.gov.in"
+  },
+  "election_schedule_2026": {
+    "announcement": "April 1, 2026",
+    "nomination_start": "April 6, 2026",
+    "nomination_deadline": "April 11, 2026",
+    "scrutiny": "April 13, 2026",
+    "withdrawal_deadline": "April 15, 2026",
+    "polling_day": "April 26, 2026",
+    "counting_day": "April 28, 2026"
+  },
+  "required_documents": {
+    "age_proof": [
+      "Birth Certificate",
+      "Aadhaar Card",
+      "PAN Card",
+      "Driving License",
+      "Class X/XII Certificate",
+      "Indian Passport"
+    ],
+    "address_proof": [
+      "Aadhaar Card",
+      "Bank/Post Office Passbook",
+      "Indian Passport",
+      "Utility Bills (Water/Electricity/Gas - max 1 year old)",
+      "Registered Rental/Lease Agreement",
+      "Registered Sale Deed"
+    ],
+    "photo": "Recent passport-size color photograph (4.5cm x 3.5cm) with white background"
+  },
+  "voting_process_steps": [
+    {
+      "step": 1,
+      "title": "Identity Verification",
+      "description": "First official checks your name on the electoral roll and verifies ID."
+    },
+    {
+      "step": 2,
+      "title": "Inking & Registration",
+      "description": "Second official inks your finger, registers you in Form 17A, and gives a slip."
+    },
+    {
+      "step": 3,
+      "title": "Slip Verification",
+      "description": "Third official verifies the ink mark and activates the EVM."
+    },
+    {
+      "step": 4,
+      "title": "Cast Your Vote",
+      "description": "Press the blue button next to your candidate on the EVM. Listen for the beep."
+    },
+    {
+      "step": 5,
+      "title": "VVPAT Verification",
+      "description": "Check the VVPAT window for 7 seconds to see your vote's confirmation slip."
+    }
+  ],
+  "booth_etiquette": [
+    "No mobile phones or cameras inside the booth.",
+    "Maintain secrecy of your vote.",
+    "Follow queue discipline; priority for seniors/PWD.",
+    "No campaigning within 100 meters of the booth."
+  ],
+  "deep_links": {
+    "search_electoral_roll": "https://electoralsearch.eci.gov.in/",
+    "register_new_voter": "https://voters.eci.gov.in/registration/form6",
+    "know_your_polling_station": "https://voters.eci.gov.in/know-your-polling-station",
+    "know_your_candidate": "https://affidavit.eci.gov.in/"
+  }
+}

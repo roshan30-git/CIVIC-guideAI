@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicGuide AI – Your Personal Voting Assistant</title>
+<meta name="description" content="CivicGuide AI helps first-time voters in Gujarat navigate the 2026 elections with AI-powered guidance, booth finder, and document checklist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: {
+          primary: '#1E3A8A',
+          secondary: '#059669',
+          accent: '#F59E0B',
+          saffron: '#FF9933',
+          bg: '#FFFBF5'
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background: #FFFBF5; }
+  .fade-in { animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  .chip { cursor:pointer; transition: all 0.2s; }
+  .chip:hover { transform: scale(1.03); }
+  .phase-btn { transition: all 0.2s; }
+  .phase-btn.active { background: #1E3A8A; color: white; }
+  .phase-btn:not(.active):hover { background: #EEF2FF; }
+  .ai-loading { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .progress-line { height:3px; background: linear-gradient(90deg,#FF9933,#fff 50%,#059669); }
+  .checklist-item:has(input:checked) { background:#f0fdf4; text-decoration:line-through; color:#059669; }
+  .btn-main { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; border-radius:12px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+  .btn-main:hover { transform:translateY(-2px); box-shadow:0 8px 20px -8px rgba(30,58,138,0.5); }
+  ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f1f5f9; } ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:99px; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 0: HERO / LANDING -->
+<div id="screen-hero" class="min-h-screen flex flex-col">
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">🗳</div>
+        <span class="font-bold text-gray-900">CivicGuide AI</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-gray-500 hidden sm:block">Made for PromptWars 2026</span>
+        <button onclick="startOnboarding()" class="btn-main bg-primary text-white text-sm py-2 px-5">Get Started →</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <main class="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 max-w-3xl mx-auto">
+    <div class="progress-line w-24 h-1 mx-auto rounded-full mb-6"></div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+      Get your voting plan<br><span class="text-primary">in 30 seconds</span>
+    </h1>
+    <p class="text-lg text-gray-600 mb-8 max-w-xl">Answer 3 quick questions. We'll create your personalized roadmap for the 2026 Gujarat Elections — registration, documents, booth, and poll day.</p>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-10">
+      <button onclick="startOnboarding()" class="btn-main bg-primary text-white">✅ Create My Voting Plan — Free</button>
+      <a href="#how-it-works" class="btn-main bg-white border border-gray-200 text-gray-700">How it works ↓</a>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 max-w-sm mx-auto text-center">
+      <div><div class="text-2xl font-extrabold text-primary">3</div><div class="text-xs text-gray-500 mt-1">Quick questions</div></div>
+      <div><div class="text-2xl font-extrabold text-secondary">4</div><div class="text-xs text-gray-500 mt-1">Voting phases</div></div>
+      <div><div class="text-2xl font-extrabold text-saffron">100%</div><div class="text-xs text-gray-500 mt-1">AI-powered</div></div>
+    </div>
+  </main>
+
+  <!-- How it works -->
+  <section id="how-it-works" class="bg-white py-16 px-4">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-bold text-center text-gray-900 mb-10">How CivicGuide AI Works</h2>
+      <div class="grid sm:grid-cols-3 gap-6">
+        <div class="text-center p-6 rounded-2xl bg-blue-50 border border-blue-100">
+          <div class="text-4xl mb-3">💬</div>
+          <h3 class="font-bold text-gray-900 mb-2">1. Vibe Check</h3>
+          <p class="text-sm text-gray-600">Answer 3 questions about your voting status</p>
+        </div>
+        <div class="text-center p-6 rounded-2xl bg-green-50 border border-green-100">
+          <div class="text-4xl mb-3">🗺️</div>
+          <h3 class="font-bold text-gray-900 mb-2">2. Get Your Plan</h3>
+          <p class="text-sm text-gray-600">AI builds your personalized 4-phase voter journey</p>
+        </div>
+        <div class="text-center p-6 rounded-2xl bg-amber-50 border border-amber-100">
+          <div class="text-4xl mb-3">🗳️</div>
+          <h3 class="font-bold text-gray-900 mb-2">3. Vote Confidently</h3>
+          <p class="text-sm text-gray-600">Follow your step-by-step guide on poll day</p>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+        <button onclick="startOnboarding()" class="btn-main bg-primary text-white">Start Now — It's Free</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- SCREEN 1: ONBOARDING -->
+<div id="screen-onboarding" class="hidden min-h-screen bg-bg flex flex-col">
+  <div class="max-w-2xl mx-auto w-full px-4 py-10 flex-1 flex flex-col justify-center">
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">🗳</div>
+      <h1 class="text-2xl font-extrabold text-gray-900">Quick Vibe Check</h1>
+      <p class="text-gray-500 mt-1">3 questions · Takes 30 seconds</p>
+    </div>
+    <div id="onboarding-area" class="space-y-4"></div>
+  </div>
+</div>
+
+<!-- SCREEN 2: DASHBOARD -->
+<div id="screen-dashboard" class="hidden min-h-screen flex flex-col sm:flex-row bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-full sm:w-56 bg-white border-b sm:border-b-0 sm:border-r border-gray-200 flex sm:flex-col gap-1 sm:gap-0 p-3 sm:p-4 sm:sticky sm:top-0 sm:h-screen overflow-x-auto sm:overflow-y-auto">
+    <div class="hidden sm:flex items-center gap-2 mb-6 px-2">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs">🗳</div>
+      <span class="font-bold text-gray-900 text-sm">CivicGuide AI</span>
+    </div>
+    <button onclick="showPhase(1)" id="nav-1" class="sidebar-nav flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 whitespace-nowrap">📋 Registration</button>
+    <button onclick="showPhase(2)" id="nav-2" class="sidebar-nav flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 whitespace-nowrap">📄 Documents</button>
+    <button onclick="showPhase(3)" id="nav-3" class="sidebar-nav flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 whitespace-nowrap">📍 Booth Finder</button>
+    <button onclick="showPhase(4)" id="nav-4" class="sidebar-nav flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 whitespace-nowrap">🗳️ Poll Day</button>
+    <div class="sm:mt-auto sm:pt-4 hidden sm:block">
+      <div class="bg-emerald-50 rounded-xl p-3 border border-emerald-100 text-center">
+        <div class="text-2xl mb-1">👆</div>
+        <p class="text-xs font-bold text-emerald-800">Every vote counts!</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col min-h-0">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+      <div>
+        <h2 class="font-bold text-gray-900" id="dash-title">Your Voter Journey</h2>
+        <p class="text-xs text-gray-500" id="dash-subtitle">Follow these steps to vote with confidence</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="mode-select" onchange="setMode(this.value)" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-gray-50 font-medium">
+          <option value="normal">🧠 Normal</option>
+          <option value="simpler">😊 Simpler</option>
+          <option value="deepdive">📚 Deep-Dive</option>
+          <option value="gu">🌐 ગુજરાતી</option>
+          <option value="hi">🌐 हिंदी</option>
+        </select>
+        <button onclick="location.reload()" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg hover:bg-gray-50">↩ Restart</button>
+      </div>
+    </header>
+
+    <!-- Progress bar -->
+    <div class="bg-white border-b border-gray-100 px-4 sm:px-6 py-3">
+      <div class="flex items-center gap-2 max-w-2xl">
+        <div class="flex-1 flex items-center gap-2">
+          <div id="step-1" class="flex flex-col items-center gap-1 cursor-pointer" onclick="showPhase(1)">
+            <div class="w-8 h-8 rounded-full border-2 border-primary bg-primary text-white flex items-center justify-center text-xs font-bold transition-all">1</div>
+            <span class="text-xs font-medium text-primary hidden sm:block">Register</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-gray-200" id="line-1"></div>
+          <div id="step-2" class="flex flex-col items-center gap-1 cursor-pointer" onclick="showPhase(2)">
+            <div class="w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold transition-all">2</div>
+            <span class="text-xs font-medium text-gray-400 hidden sm:block">Docs</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-gray-200" id="line-2"></div>
+          <div id="step-3" class="flex flex-col items-center gap-1 cursor-pointer" onclick="showPhase(3)">
+            <div class="w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold transition-all">3</div>
+            <span class="text-xs font-medium text-gray-400 hidden sm:block">Booth</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-gray-200" id="line-3"></div>
+          <div id="step-4" class="flex flex-col items-center gap-1 cursor-pointer" onclick="showPhase(4)">
+            <div class="w-8 h-8 rounded-full border-2 border-gray-300 bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold transition-all">4</div>
+            <span class="text-xs font-medium text-gray-400 hidden sm:block">Poll Day</span>
+          </div>
+        </div>
+        <div class="ml-4 text-xs text-gray-400 hidden sm:block" id="phase-label">Phase 1 of 4</div>
+      </div>
+    </div>
+
+    <!-- Phase content -->
+    <div class="flex-1 p-4 sm:p-6 overflow-y-auto" id="phase-content">
+    </div>
+  </main>
+</div>
+
+<script src="app.js?v=2.0"></script>
+</body>
+</html>

@@ -272,6 +272,7 @@ function restoreChecklist() {
 
 function phase3() {
   const pin = state.pincode || '395006';
+  const isSurat = pin.startsWith('395');
   const mapsUrl = `https://www.google.com/maps/search/Polling+Station+near+${pin}`;
   return `
   <div class="max-w-2xl space-y-4">
@@ -284,6 +285,17 @@ function phase3() {
         <a href="${mapsUrl}" target="_blank" rel="noopener" class="btn-main bg-primary text-white w-full justify-center">
           🗺️ Open Google Maps — Booths near ${pin}
         </a>
+        
+        ${isSurat ? `
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p class="text-xs font-bold text-primary uppercase mb-2">📍 Surat North Special Feature</p>
+            <p class="text-sm text-gray-700 mb-3">We found an official polling station list for your area.</p>
+            <a href="surat-north-booths.pdf" target="_blank" class="btn-main bg-white border border-primary text-primary w-full justify-center text-sm">
+              📄 View Official Booth List (PDF)
+            </a>
+          </div>
+        ` : ''}
+
         <button onclick="generateICS()" class="btn-main bg-amber-500 text-white w-full justify-center">
           📅 Set Poll Day Reminder (April 26, 2026)
         </button>

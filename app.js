@@ -16,7 +16,15 @@ const UI_STRINGS = {
     nav: ['Registration', 'Documents', 'Booth Finder', 'Poll Day'],
     phases: ['Phase 1 of 4', 'Phase 2 of 4', 'Phase 3 of 4', 'Phase 4 of 4'],
     buttons: { next: 'Next', back: 'Back', continue: 'Continue →', register: 'Register Now', download: 'Download', share: 'Share' },
-    titles: { reg: 'Registration Status', docs: 'Document Preparation', booth: 'Find Polling Booth', vote: 'Poll Day Guide' }
+    titles: { reg: 'Registration Status', docs: 'Document Preparation', booth: 'Find Polling Booth', vote: 'Poll Day Guide' },
+    docs: ['Voter ID (EPIC Card)','Aadhaar Card','PAN Card','Driving License','Passport','Class X/XII Certificate'],
+    steps: [
+      {n:1,e:'🏫',t:'Reach the Booth',d:'Arrive early. Carry your Voter ID or any valid photo ID.'},
+      {n:2,e:'🪪',t:'Identity Check',d:'Officer checks your name in the electoral roll & verifies your ID.'},
+      {n:3,e:'👆',t:'Ink & Register',d:'Finger inked with indelible ink. Sign register (Form 17A).'},
+      {n:4,e:'🗳️',t:'Cast Your Vote',d:'Press the blue button beside your candidate on the EVM. Wait for the beep.'},
+      {n:5,e:'📋',t:'VVPAT Check',d:'Check VVPAT window for 7 seconds to confirm your vote.'}
+    ]
   },
   gu: {
     onboarding: [
@@ -27,7 +35,15 @@ const UI_STRINGS = {
     nav: ['નોંધણી', 'દસ્તાવેજો', 'બૂથ શોધો', 'મતદાન દિવસ'],
     phases: ['તબક્કો 1 થી 4', 'તબક્કો 2 થી 4', 'તબક્કો 3 થી 4', 'તબક્કો 4 થી 4'],
     buttons: { next: 'આગળ', back: 'પાછળ', continue: 'આગળ વધો →', register: 'હમણાં નોંધણી કરો', download: 'ડાઉનલોડ', share: 'શેર કરો' },
-    titles: { reg: 'નોંધણી સ્થિતિ', docs: 'દસ્તાવેજ તૈયારી', booth: 'મતદાન મથક શોધો', vote: 'મતદાન દિવસ માર્ગદર્શિકા' }
+    titles: { reg: 'નોંધણી સ્થિતિ', docs: 'દસ્તાવેજ તૈયારી', booth: 'મતદાન મથક શોધો', vote: 'મતદાન દિવસ માર્ગદર્શિકા' },
+    docs: ['ચૂંટણી કાર્ડ (EPIC)', 'આધાર કાર્ડ', 'પાન કાર્ડ', 'ડ્રાઇવિંગ લાયસન્સ', 'પાસપોર્ટ', 'ધોરણ 10/12 નું પ્રમાણપત્ર'],
+    steps: [
+      {n:1,e:'🏫',t:'મથક પર પહોંચો',d:'વહેલા પહોંચો. તમારું વોટર આઈડી અથવા કોઈપણ માન્ય ફોટો આઈડી સાથે રાખો.'},
+      {n:2,e:'🪪',t:'ઓળખ તપાસ',d:'અધિકારી મતદાર યાદીમાં તમારું નામ તપાસે છે અને તમારી આઈડીની ચકાસણી કરે છે.'},
+      {n:3,e:'👆',t:'શાહી અને નોંધણી',d:'આંગળી પર અમીટ શાહી લગાવવામાં આવે છે. રજિસ્ટર (ફોર્મ 17A) માં સહી કરો.'},
+      {n:4,e:'🗳️',t:'તમારો મત આપો',d:'EVM પર તમારા ઉમેદવારની બાજુનું બ્લુ બટન દબાવો. બીપ અવાજની રાહ જુઓ.'},
+      {n:5,e:'📋',t:'VVPAT તપાસ',d:'તમારા મતની પુષ્ટિ કરવા માટે 7 સેકન્ડ માટે VVPAT વિન્ડો તપાસો.'}
+    ]
   },
   hi: {
     onboarding: [
@@ -38,19 +54,19 @@ const UI_STRINGS = {
     nav: ['पंजीकरण', 'दस्तावेज', 'बूथ खोजें', 'मतदान दिवस'],
     phases: ['चरण 1 से 4', 'चरण 2 से 4', 'चरण 3 से 4', 'चरण 4 से 4'],
     buttons: { next: 'अगला', back: 'पीछे', continue: 'आगे बढ़ें →', register: 'अभी पंजीकरण करें', download: 'डाउनलोड', share: 'शेयर करें' },
-    titles: { reg: 'पंजीकरण स्थिति', docs: 'दस्तावेज तैयारी', booth: 'मतदान केंद्र खोजें', vote: 'मतदान दिवस गाइड' }
+    titles: { reg: 'पंजीकरण स्थिति', docs: 'दस्तावेज तैयारी', booth: 'मतदान केंद्र खोजें', vote: 'मतदान दिवस गाइड' },
+    docs: ['वोटर आईडी (EPIC)', 'आधार कार्ड', 'पैन कार्ड', 'ड्राइविंग लाइसेंस', 'पासपोर्ट', 'कक्षा 10/12 का प्रमाण पत्र'],
+    steps: [
+      {n:1,e:'🏫',t:'बूथ पर पहुंचें',d:'जल्दी पहुंचें। अपना वोटर आईडी या कोई भी वैध फोटो आईडी साथ रखें।'},
+      {n:2,e:'🪪',t:'पहचान की जाँच',d:'अधिकारी मतदाता सूची में आपका नाम जांचता है और आपकी आईडी सत्यापित करता है।'},
+      {n:3,e:'👆',t:'स्याही और पंजीकरण',d:'उंगली पर अमिट स्याही लगाई जाती है। रजिस्टर (फॉर्म 17A) पर हस्ताक्षर करें।'},
+      {n:4,e:'🗳️',t:'अपना वोट डालें',d:'EVM पर अपने उम्मीदवार के बगल वाला नीला बटन दबाएं। बीप की प्रतीक्षा करें।'},
+      {n:5,e:'📋',t:'VVPAT जाँच',d:'अपने वोट की पुष्टि के लिए 7 सेकंड तक VVPAT विंडो देखें।'}
+    ]
   }
 };
 
 const DATA = {
-  docs: ['Voter ID (EPIC Card)','Aadhaar Card','PAN Card','Driving License','Passport','Class X/XII Certificate'],
-  steps: [
-    {n:1,e:'🏫',t:'Reach the Booth',d:'Arrive early. Carry your Voter ID or any valid photo ID.'},
-    {n:2,e:'🪪',t:'Identity Check',d:'Officer checks your name in the electoral roll & verifies your ID.'},
-    {n:3,e:'👆',t:'Ink & Register',d:'Finger inked with indelible ink. Sign register (Form 17A).'},
-    {n:4,e:'🗳️',t:'Cast Your Vote',d:'Press the blue button beside your candidate on the EVM. Wait for the beep.'},
-    {n:5,e:'📋',t:'VVPAT Check',d:'Check VVPAT window for 7 seconds to confirm your vote.'}
-  ],
   links: {
     search: 'https://electoralsearch.eci.gov.in/',
     register: 'https://voters.eci.gov.in/registration/form6'
@@ -189,7 +205,7 @@ function phase2(s) {
       <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[1]}</span>
       <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.docs}</h2>
       <div class="space-y-2" id="doc-checklist">
-        ${DATA.docs.map((d,i)=>`<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-50"><input type="checkbox" onchange="saveDoc(${i},this.checked)" class="accent-primary"> <span class="text-sm font-medium text-gray-700">${d}</span></label>`).join('')}
+        ${s.docs.map((d,i)=>`<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-50"><input type="checkbox" onchange="saveDoc(${i},this.checked)" class="accent-primary"> <span class="text-sm font-medium text-gray-700">${d}</span></label>`).join('')}
       </div>
       <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>
@@ -225,7 +241,7 @@ function phase4(s) {
       <span class="text-xs font-bold text-primary bg-blue-50 px-2 py-0.5 rounded-full">${s.phases[3]}</span>
       <h2 class="text-xl font-bold text-gray-900 mt-2 mb-4">${s.titles.vote}</h2>
       <div class="space-y-4">
-        ${DATA.steps.map(st=>`<div class="flex gap-4 items-start"><div class="w-7 h-7 rounded-full bg-blue-50 text-primary flex items-center justify-center font-bold text-xs shrink-0">${st.n}</div><div><p class="font-bold text-sm text-gray-900">${st.e} ${st.t}</p><p class="text-xs text-gray-500">${st.d}</p></div></div>`).join('')}
+        ${s.steps.map(st=>`<div class="flex gap-4 items-start"><div class="w-7 h-7 rounded-full bg-blue-50 text-primary flex items-center justify-center font-bold text-xs shrink-0">${st.n}</div><div><p class="font-bold text-sm text-gray-900">${st.e} ${st.t}</p><p class="text-xs text-gray-500">${st.d}</p></div></div>`).join('')}
       </div>
       <div id="ai-area" class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" aria-live="polite"><span class="ai-loading">🤖 AI Loading...</span></div>
     </div>

@@ -57,7 +57,7 @@ We chose this vertical to address **Information Asymmetry** in the electoral pro
 | **Security** | `sessionStorage` caching and sanitized AI prompt construction. No persistent user data tracking. |
 | **Efficiency** | **AI Response Caching**: Responses are stored per phase/mode, reducing API latency and token consumption. |
 | **Testing** | Includes `voter-tests.js`, an automated browser-based test suite verifying 12+ core logic paths. |
-| **Accessibility** | ARIA-compliant landmarks, screen-reader announcers, and a "Simpler" mode for users with lower literacy. |
+| **Accessibility** | ARIA-compliant landmarks, screen-reader announcers, and **Deep Localization** covering all UI elements, phases, and poll steps in 3 languages. |
 | **Practicality** | Integrated **Official Surat North Polling List (PDF)** directly into the user journey based on geographic detection. |
 
 ---
